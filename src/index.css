@@ -1,0 +1,51 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  /* Force dark mode */
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #0f0c29;
+  /* Fallback */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --primary-color: #00f2ff;
+  /* Neon Cyan */
+  --bg-color: #0f0c29;
+  --card-bg: #2a2a2a;
+  --text-color: #e0e0e0;
+  --success-color: #00ff88;
+  /* Neon Green */
+  --danger-color: #ff0055;
+  /* Neon Red */
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
