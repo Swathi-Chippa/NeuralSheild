@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 import pickle
 import numpy as np
 from feature_extraction import extract_features
 
 app = Flask(__name__)
-CORS(app)   # ⭐ this line fixes the problem
+# Update these origins if the frontend is deployed elsewhere.
+CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
 model = pickle.load(open("model/phishing_model.pkl", "rb"))
 
@@ -29,4 +31,5 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # debug=True must never be used outside local development because it exposes the Werkzeug interactive debugger.
+    app.run(debug=os.environ.get("FLASK_DEBUG", "false").lower() == "true")
