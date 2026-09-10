@@ -26,7 +26,8 @@ def emit(message=""):
 
 emit("=== 1. DATASET LOADING ===")
 data = pd.read_csv("datasets/phishing.csv")
-X = data.drop(["index", "Result"], axis=1)
+# Google_Index excluded  no compliant free live-computation method exists (Google provides no public API to check arbitrary URL index status; only paid third-party services or ToS-violating scraping are available), so it is dropped to keep training and live-inference feature sets consistent.
+X = data.drop(["index", "Google_Index", "Result"], axis=1)
 y = data["Result"]
 emit(f"X.shape: {X.shape}")
 emit("y.value_counts:")
