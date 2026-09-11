@@ -1,25 +1,26 @@
 === 1. DATASET LOADING ===
-X.shape: (11055, 29)
+X.shape: (11055, 28)
+Feature count: 28
 y.value_counts:
 Result
  1    6157
 -1    4898
 === 2. TRAIN/TEST SPLIT ===
-X_train.shape: (8844, 29)
-X_test.shape: (2211, 29)
+X_train.shape: (8844, 28)
+X_test.shape: (2211, 28)
 === 3. BASELINE 5-FOLD CROSS-VALIDATION ===
-Baseline fold F1 scores: [0.9708249496981891, 0.969758064516129, 0.9702471003530005, 0.96875, 0.9701568032372281]
-Baseline mean F1: 0.9699473835609094
-Baseline standard deviation: 0.0006889670782038133
+Baseline fold F1 scores: [0.9696969696969697, 0.9651691065118627, 0.9667338709677419, 0.96579476861167, 0.9634888438133874]
+Baseline mean F1: 0.9661767119203264
+Baseline standard deviation: 0.0020537003349382415
 === 4. HYPERPARAMETER GRID SEARCH ===
-Best parameters: {'max_depth': None, 'min_samples_split': 2, 'n_estimators': 200}
-Best cross-validated F1: 0.970373667751735
+Best parameters: {'max_depth': 20, 'min_samples_split': 2, 'n_estimators': 100}
+Best cross-validated F1: 0.967012507860351
 === 5. HELD-OUT TEST EVALUATION ===
-Accuracy: 0.9742198100407056
+Accuracy: 0.9724106739032112
 Classification report:
               precision    recall  f1-score   support
 
-          -1       0.98      0.96      0.97       980
+          -1       0.97      0.97      0.97       980
            1       0.97      0.98      0.98      1231
 
     accuracy                           0.97      2211
@@ -28,39 +29,38 @@ weighted avg       0.97      0.97      0.97      2211
 
 Confusion matrix labels: rows = actual; columns = predicted
 Class order for both axes: [-1 (phishing), 1 (legitimate)]
-[[ 943   37]
- [  20 1211]]
-ROC AUC (positive class 1 / legitimate): 0.9970602131998211
+[[ 946   34]
+ [  27 1204]]
+ROC AUC (positive class 1 / legitimate): 0.9973959283144614
 === 6. FEATURE IMPORTANCES ===
-(SSLfinal_State, 0.3309093645423413)
-(URL_of_Anchor, 0.2371809946274579)
-(having_Sub_Domain, 0.07149562819835154)
-(web_traffic, 0.07044768305837466)
-(Links_in_tags, 0.044557617980026415)
-(Prefix_Suffix, 0.04100774083823864)
-(Request_URL, 0.021528390219816052)
-(Links_pointing_to_page, 0.020236717776066216)
-(SFH, 0.019480174062810492)
-(Domain_registeration_length, 0.017583209048208343)
-(age_of_domain, 0.016805652178531756)
-(having_IPhaving_IP_Address, 0.014010333344015267)
-(DNSRecord, 0.013322614173369409)
-(Page_Rank, 0.011394708156495006)
-(URLURL_Length, 0.009347281892067334)
-(Redirect, 0.006118796450747962)
-(HTTPS_token, 0.006102519665620741)
-(Submitting_to_email, 0.005728155537473836)
-(Statistical_report, 0.005497350560019662)
-(having_At_Symbol, 0.005191887045660676)
-(popUpWidnow, 0.004985664739666599)
-(Shortining_Service, 0.004696375945377543)
-(Favicon, 0.004269113519564776)
-(double_slash_redirecting, 0.0038353581937265718)
-(Abnormal_URL, 0.003787556360880732)
-(on_mouseover, 0.003620020786530023)
-(port, 0.0029155333491874356)
-(Iframe, 0.002432190632215562)
-(RightClick, 0.0015113671171573908)
+(SSLfinal_State, 0.341526036288468)
+(URL_of_Anchor, 0.24516214807642542)
+(web_traffic, 0.07185667281837493)
+(having_Sub_Domain, 0.0703833368311025)
+(Prefix_Suffix, 0.04406543229084698)
+(Links_in_tags, 0.043614929478472834)
+(Request_URL, 0.021237987898278132)
+(SFH, 0.020480909028242445)
+(age_of_domain, 0.016256670941978572)
+(Domain_registeration_length, 0.015406145319563226)
+(having_IPhaving_IP_Address, 0.013493217596948655)
+(DNSRecord, 0.012900104595684142)
+(Page_Rank, 0.011163852984580232)
+(URLURL_Length, 0.009563497907910057)
+(HTTPS_token, 0.00746461826778276)
+(Redirect, 0.00604407857435135)
+(popUpWidnow, 0.005857637903102857)
+(having_At_Symbol, 0.005687162529036507)
+(Statistical_report, 0.0054457259689992404)
+(Submitting_to_email, 0.005395621655778034)
+(Shortining_Service, 0.004724986929001624)
+(double_slash_redirecting, 0.004347514845805242)
+(Favicon, 0.004304926554510071)
+(on_mouseover, 0.0037189206283080637)
+(Abnormal_URL, 0.0035992631105254626)
+(port, 0.002495202301903742)
+(Iframe, 0.002446120702316548)
+(RightClick, 0.001357277971702266)
 === 7. MODEL SAVE ===
 Saved tuned model to model/phishing_model.pkl
 === 8. TRAINING REPORT SAVE ===
