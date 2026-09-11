@@ -624,6 +624,15 @@ def _statistical_report_feature(url: str) -> int:
 
 def extract_features(url: str) -> list[int]:
     """Return exactly 28 encoded features in the model's training-column order."""
+    hostname = _hostname(url)
+    try:
+        resolve_and_validate_host(hostname)
+    except SSRFBlockedError:
+        # Reliability/consistency fix: avoid repeated feature failures after the
+        # host has already been rejected; this is not a new security boundary.
+        # WHOIS lookups target WHOIS servers, not the attacker-supplied host.
+        return [-1] * len(FEATURE_NAMES)
+
     feature_functions = [
         _ip_address_feature,
         _url_length_feature,
