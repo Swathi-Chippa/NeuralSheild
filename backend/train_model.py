@@ -27,9 +27,13 @@ def emit(message=""):
 emit("=== 1. DATASET LOADING ===")
 data = pd.read_csv("datasets/phishing.csv")
 # Google_Index excluded  no compliant free live-computation method exists (Google provides no public API to check arbitrary URL index status; only paid third-party services or ToS-violating scraping are available), so it is dropped to keep training and live-inference feature sets consistent.
-X = data.drop(["index", "Google_Index", "Result"], axis=1)
+# Links_pointing_to_page excluded  genuine external-backlink-countdata requires paid services (Ahrefs, Moz, SEMrever, Majestic); no free livesource exists, so it is dropped to keep training and live-inference featuresets consistent, same rationale as Google_Index.
+X = data.drop(
+    ["index", "Google_Index", "Links_pointing_to_page", "Result"], axis=1
+)
 y = data["Result"]
 emit(f"X.shape: {X.shape}")
+emit("Feature count: 28")
 emit("y.value_counts:")
 emit(y.value_counts().to_string())
 
