@@ -1,0 +1,25 @@
+LIVE PHISHING MODEL EVALUATION
+Run date/time: 2026-09-16T02:37:35+05:30
+Random seed: 42
+Phishing URLs sampled/tested: 60
+Legitimate URLs sampled/tested: 60
+Phishing URLs evaluated: 51
+Legitimate URLs evaluated: 45
+Phishing URLs excluded as unreachable: 9
+Legitimate URLs excluded as unreachable: 15
+Total URLs excluded as unreachable: 24
+excluded_but_counted_as_phishing_due_to_ssl_error (phishing): 5
+excluded_but_counted_as_phishing_due_to_ssl_error (legitimate false positives): 0
+Phishing accuracy (recall): 0.9216 (92.16%)
+Phishing accuracy 95% CI: [0.8478, 0.9954] (84.78% to 99.54%)
+Legitimate accuracy (specificity): 0.8444 (84.44%)
+Legitimate accuracy 95% CI: [0.7385, 0.9503] (73.85% to 95.03%)
+Overall accuracy: 0.8854 (88.54%)
+Overall accuracy 95% CI: [0.8217, 0.9491] (82.17% to 94.91%)
+Original 2012-era held-out test accuracy: 0.9724 (97.24%)
+Overall gap versus original test accuracy: -0.0870 (-8.70 percentage points)
+Exclusion reasons by class:
+  Phishing: DNS failure=9, connection timeout=0, connection refused=0, other=0
+  Legitimate: DNS failure=13, connection timeout=1, connection refused=0, other=1
+Conclusion: Meaningful gap detected: this suggests concept drift and/or dataset staleness is affecting real-world performance.
+Raw OpenPhish URLs were not saved.

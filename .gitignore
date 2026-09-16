@@ -27,3 +27,4 @@ __pycache__/
 *.pyc
 *.pyo
 backend/.env
+backend/.evaluation_cache/
