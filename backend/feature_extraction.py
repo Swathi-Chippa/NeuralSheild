@@ -74,6 +74,17 @@ class SSRFBlockedError(Exception):
     """Raised when a hostname resolves to a non-public or otherwise unsafe IP."""
 
 
+def _retry_transient_network_call(function: Callable[[], Any]) -> Any:
+    """Retry one brief DNS/connection-reset failure without masking other errors."""
+    try:
+        return function()
+    except (socket.gaierror, ConnectionResetError):
+        # A single delayed retry handles brief transient network blips without
+        # masking genuine persistent failures or adding excessive latency.
+        time.sleep(1)
+        return function()
+
+
 def _parse_url(url: str):
     try:
         parsed = urlparse(url)
@@ -105,7 +116,9 @@ def _unsafe_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
 def resolve_and_validate_host(hostname: str) -> list[str]:
     """Resolve every address for a host and reject any non-public address."""
     try:
-        address_info = socket.getaddrinfo(hostname, None)
+        address_info = _retry_transient_network_call(
+            lambda: socket.getaddrinfo(hostname, None)
+        )
     except OSError:
         raise
 
@@ -269,7 +282,7 @@ def _date_value(value: Any) -> datetime | None:
 
 
 def _whois_record(domain: str):
-    return whois.whois(domain)
+    return _retry_transient_network_call(lambda: whois.whois(domain))
 
 
 def _static_script_text(soup: BeautifulSoup) -> str:
@@ -354,8 +367,9 @@ def _ssl_feature(url: str) -> int:
 
 # Rule 9: an expiry within 365 days, or a failed WHOIS lookup, is phishing.
 @_fail_closed
-def _registration_length_feature(url: str) -> int:
-    record = _whois_record(_hostname(url))
+def _registration_length_feature(url: str, record=None) -> int:
+    if record is None:
+        return -1
     expiration = _date_value(getattr(record, "expiration_date", None))
     if expiration is None:
         return -1
@@ -478,8 +492,9 @@ def _submitting_to_email_feature(url: str) -> int:
 
 # Rule 18: WHOIS identity presence approximates the original hostname identity rule.
 @_fail_closed
-def _abnormal_url_feature(url: str) -> int:
-    record = _whois_record(_hostname(url))
+def _abnormal_url_feature(url: str, record=None) -> int:
+    if record is None:
+        return -1
     domain_name = getattr(record, "domain_name", None)
     registrant = getattr(record, "registrant_name", None) or getattr(
         record, "org", None
@@ -541,8 +556,9 @@ def _iframe_feature(url: str) -> int:
 
 # Rule 24: a WHOIS creation age below 180 days, or failed WHOIS, is phishing.
 @_fail_closed
-def _age_of_domain_feature(url: str) -> int:
-    record = _whois_record(_hostname(url))
+def _age_of_domain_feature(url: str, record=None) -> int:
+    if record is None:
+        return -1
     creation = _date_value(getattr(record, "creation_date", None))
     if creation is None:
         return -1
@@ -552,7 +568,7 @@ def _age_of_domain_feature(url: str) -> int:
 # Rule 25: DNSRecord checks whether any DNS resolution succeeds; private results remain informative here.
 @_fail_closed
 def _dns_record_feature(url: str) -> int:
-    socket.getaddrinfo(_hostname(url), None)
+    _retry_transient_network_call(lambda: socket.getaddrinfo(_hostname(url), None))
     return 1
 
 
@@ -626,6 +642,11 @@ def extract_features(url: str) -> list[int]:
     """Return exactly 28 encoded features in the model's training-column order."""
     hostname = _hostname(url)
     try:
+        whois_record = _whois_record(hostname)
+    except Exception as exc:
+        logger.debug("WHOIS lookup failed for %s: %s", hostname, exc)
+        whois_record = None
+    try:
         resolve_and_validate_host(hostname)
     except SSRFBlockedError:
         # Reliability/consistency fix: avoid repeated feature failures after the
@@ -642,7 +663,7 @@ def extract_features(url: str) -> list[int]:
         _prefix_suffix_feature,
         _subdomain_feature,
         _ssl_feature,
-        _registration_length_feature,
+        lambda value: _registration_length_feature(value, whois_record),
         _favicon_feature,
         _port_feature,
         _https_token_feature,
@@ -651,13 +672,13 @@ def extract_features(url: str) -> list[int]:
         _links_in_tags_feature,
         _sfh_feature,
         _submitting_to_email_feature,
-        _abnormal_url_feature,
+        lambda value: _abnormal_url_feature(value, whois_record),
         _redirect_feature,
         _mouseover_feature,
         _right_click_feature,
         _popup_feature,
         _iframe_feature,
-        _age_of_domain_feature,
+        lambda value: _age_of_domain_feature(value, whois_record),
         _dns_record_feature,
         _web_traffic_feature,
         _page_rank_feature,
